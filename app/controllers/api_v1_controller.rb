@@ -1,6 +1,11 @@
 class ApiV1Controller < ApplicationController
+  # NOTE: None of these functions return errors in JSON format. Given more time, I'd want to devise
+  # or adopt a standard system for sending results/metadata/errors.
   def get_filers
     query = Organization.joins(:filings).distinct.order("created_at DESC")
+    if params["filer_id"] != nil
+      query = query.where id: params["filer_id"]
+    end
     render json: query.all
   end
 
@@ -11,6 +16,7 @@ class ApiV1Controller < ApplicationController
     end
     # Standard ordering for most relevant to least relevant.
     query = query.order "tax_period DESC, amended DESC, return_time DESC"
+    # Skipping pagination for now.
     render json: query.all
   end
 
