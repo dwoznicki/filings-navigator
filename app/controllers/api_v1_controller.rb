@@ -1,7 +1,7 @@
 class ApiV1Controller < ApplicationController
   def get_filers
-    filers = Organization.joins(:filings).distinct
-    render json: filers
+    query = Organization.joins(:filings).distinct.order("created_at DESC")
+    render json: query.all
   end
 
   def get_filings
@@ -9,27 +9,14 @@ class ApiV1Controller < ApplicationController
     if params["filer_id"] != nil
       query = query.where filer_id: params["filer_id"]
     end
-    if params["order"] == "return_time_asc"
-      ordering = "return_time ASC"
-    else
-      ordering = "return_time DESC" # default
-    end
-    query = query.order ordering
+    # Standard ordering for most relevant to least relevant.
+    query = query.order "tax_period DESC, amended DESC, return_time DESC"
     render json: query.all
   end
 
   def get_awards
     query = Award.all
-    if params["filing_id"] != nil
-      query = query.where filing_id: params["filing_id"]
-    end
-    if params["order"] == "created_at_asc"
-      ordering = "created_at ASC"
-    else
-      ordering = "created_at DESC" # default
-    end
-    query = query.order ordering
-    render json: query.all
+    render json: ApiV1Controller.build_awards_query(params, query, :select).all
   end
 
   def get_recipients
@@ -56,6 +43,37 @@ class ApiV1Controller < ApplicationController
       ordering = "created_at DESC" # default
     end
     query = query.order ordering
+    query = ApiV1Controller.paginate params, query
     render json: query.all
+  end
+
+  private
+  # These are helpers for building API queries. Realistically, I'd probably split these off into
+  # another module, but I'll but them here for simplicity.
+  def self.build_awards_query(params, query, query_type)
+    if params["filing_id"] != nil
+      query = query.where filing_id: params["filing_id"]
+    end
+    if query_type == :select
+      if params["order"] == "created_at_asc"
+        ordering = "created_at ASC"
+      else
+        ordering = "created_at DESC" # default
+      end
+      query = query.order ordering
+      query = ApiV1Controller.paginate params, query
+    end
+    return query
+  end
+
+  def self.paginate(params, query)
+    # We'll use offset pagination for this demo. Depending on the amount of data, this can lead to
+    # poor performance because we have to read and throw out a bunch of rows.
+    # In production, unless I was pretty confident that the table we're querying is going to be
+    # small (i.e. less than 10k rows), I'd probably implement cursor based pagination. This is more
+    # involved, and specific to each table, but yields better performance.
+    page_size = params["page_size"]&.to_i || 10
+    page = params["page"]&.to_i || 1 # 1 index because it reads better in the URL
+    return query.offset((page - 1) * page_size).limit(page_size)
   end
 end
