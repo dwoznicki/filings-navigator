@@ -2,6 +2,25 @@ require "open-uri"
 require "nokogiri"
 
 module Injest
+  # Tested with the following return versions:
+  # 2015v2.1
+  # 2016v3.0
+  # 2017v2.2
+  # 2017v2.3
+  # 2018v3.1
+  # 2020v4.0
+  # 2020v4.1
+  # In production, I'd be more explicit about version handling. Different functions would likely
+  # need to parse different return versions in slightly different ways, so we'd probably want to
+  # parse the version into an actual number do do these checks.
+  # For example,
+  #
+  #   if version < 202040
+  #     parse_node_old_way node
+  #   else
+  #     parse_node_new_way node
+  #   end
+  #
   def self.injest_files(uris)
     # I'm running this in a transaction so that the entire operation fails if something goes wrong,
     # and we don't end up with part of a file parsed + inserted. In production, I'd probably put a
