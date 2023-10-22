@@ -14,7 +14,7 @@ ActiveRecord::Schema[7.0].define(version: 2023_10_20_073529) do
   create_table "awards", force: :cascade do |t|
     t.text "purpose", null: false
     t.integer "cash_amount", null: false
-    t.date "tax_period", null: false
+    t.integer "filing_id", null: false
     t.integer "recipient_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
@@ -41,6 +41,7 @@ ActiveRecord::Schema[7.0].define(version: 2023_10_20_073529) do
     t.index ["ein", "name"], name: "index_organizations_on_ein_and_name", unique: true
   end
 
+  add_foreign_key "awards", "filings"
   add_foreign_key "awards", "organizations", column: "recipient_id"
   add_foreign_key "filings", "organizations", column: "filer_id"
 end

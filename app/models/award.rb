@@ -1,7 +1,8 @@
 class Award < ApplicationRecord
+  belongs_to :filing, foreign_key: "filing_id", primary_key: "id"
   belongs_to :organization, foreign_key: "recipient_id", primary_key: "id"
 
-  def self.from_xml(node, tax_period, recipient_id)
+  def self.from_xml(node, filing_id, recipient_id)
     # purpose
     purpose_node = node.css("PurposeOfGrantTxt")[0]
     if purpose_node.nil?
@@ -15,6 +16,6 @@ class Award < ApplicationRecord
     end
     cash_amount = cash_amount_node.text.to_i
 
-    return Award.new(purpose: purpose, cash_amount: cash_amount, tax_period: tax_period, recipient_id: recipient_id)
+    return Award.new(purpose: purpose, cash_amount: cash_amount, filing_id: filing_id, recipient_id: recipient_id)
   end
 end

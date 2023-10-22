@@ -56,7 +56,7 @@ module Injest
             recipient = existing_org
             num_skipped_orgs += 1
           end
-          award = Award.from_xml recipient_table_node, filing.tax_period, recipient.id
+          award = Award.from_xml recipient_table_node, filing.id, recipient.id
           award.save!
           num_saved_awards += 1
         end
