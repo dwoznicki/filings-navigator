@@ -14,6 +14,7 @@ class CreateFilings < ActiveRecord::Migration[7.0]
     # deetermine which is valid like so.
     #   - Filings with an amended indicator beat out others within the same tax period.
     #   - Filings with a later return time beat others with an earlier return time.
+    # We'll keep all filings around, and let the application determine which is valid.
     add_index :filings, [:tax_period, :return_time, :amended, :filer_id], unique: true, name: "filings_unique_idx"
   end
 end

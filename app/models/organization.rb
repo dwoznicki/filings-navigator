@@ -1,6 +1,13 @@
+# I decided to roll both filers and recipients into a single organization model. I made this choice
+# because, looking at the data, filers and recipients both appear to have the same fields. This
+# nominally saves space if we have organizations that are both filers and recipients, but really,
+# it's just my first inclination to normalize a relational database schema as much as possible to
+# start.
+# Depending on the nature of the data, and how we intend to query it, it might make sense to split
+# filers and recipients into two separate models to avoid SQL joins.
 class Organization < ApplicationRecord
   has_many :filings, foreign_key: "filer_id"
-  has_many :awards, foreign_key: "recipient_id"
+  has_one :awards, foreign_key: "recipient_id"
 
   def self.from_xml(node)
     # TODO: Raise exceptions with a proper type instead of runtime exceptions.
