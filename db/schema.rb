@@ -12,32 +12,35 @@
 
 ActiveRecord::Schema[7.0].define(version: 2023_10_20_073529) do
   create_table "awards", force: :cascade do |t|
-    t.text "purpose"
-    t.integer "cash_amount"
-    t.date "tax_period"
-    t.integer "recipient_ein"
+    t.text "purpose", null: false
+    t.integer "cash_amount", null: false
+    t.date "tax_period", null: false
+    t.integer "recipient_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end
 
   create_table "filings", force: :cascade do |t|
-    t.datetime "return_time"
-    t.date "tax_period"
-    t.integer "filer_ein"
+    t.datetime "return_time", null: false
+    t.date "tax_period", null: false
+    t.integer "filer_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["return_time", "tax_period", "filer_id"], name: "index_filings_on_return_time_and_tax_period_and_filer_id", unique: true
   end
 
-  create_table "organizations", primary_key: "ein", force: :cascade do |t|
-    t.text "name"
-    t.text "address_line1"
-    t.text "city"
-    t.string "state_code", limit: 2
-    t.string "zip_code", limit: 10
+  create_table "organizations", force: :cascade do |t|
+    t.integer "ein"
+    t.text "name", null: false
+    t.text "address_line1", null: false
+    t.text "city", null: false
+    t.string "state_code", limit: 2, null: false
+    t.string "zip_code", limit: 10, null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["ein", "name"], name: "index_organizations_on_ein_and_name", unique: true
   end
 
-  add_foreign_key "awards", "organizations", column: "recipient_ein", primary_key: "ein"
-  add_foreign_key "filings", "organizations", column: "filer_ein", primary_key: "ein"
+  add_foreign_key "awards", "organizations", column: "recipient_id"
+  add_foreign_key "filings", "organizations", column: "filer_id"
 end
