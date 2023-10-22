@@ -21,12 +21,13 @@ ActiveRecord::Schema[7.0].define(version: 2023_10_20_073529) do
   end
 
   create_table "filings", force: :cascade do |t|
-    t.datetime "return_time", null: false
     t.date "tax_period", null: false
+    t.datetime "return_time", null: false
+    t.boolean "amended", null: false
     t.integer "filer_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["return_time", "tax_period", "filer_id"], name: "index_filings_on_return_time_and_tax_period_and_filer_id", unique: true
+    t.index ["tax_period", "return_time", "amended", "filer_id"], name: "filings_unique_idx", unique: true
   end
 
   create_table "organizations", force: :cascade do |t|
