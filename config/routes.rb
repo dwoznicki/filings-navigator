@@ -8,6 +8,7 @@ Rails.application.routes.draw do
   get "/api/v1/count_awards", to: "api_v1#count_awards", defaults: {format: :json}
   get "/api/v1/get_recipients", to: "api_v1#get_recipients", defaults: {format: :json}
   # Website routes
+  root "website#home"
   get "/", to: "website#home", defaults: {format: :html}
   get "/filer/:filer_id", to: "website#filer", defaults: {format: :html}
   get "/recipient/:recipient_id", to: "website#recipient", defaults: {format: :html}
