@@ -31,6 +31,12 @@ class ApiV1Controller < ApplicationController
     render json: ApiV1Controller.build_awards_query(params, query, :count).count
   end
 
+  def get_recipients
+    # This is currently only being used on the /recipient/:id page, so we'll leave the query simple
+    # and expecting proper input for now.
+    render json: Organization.where(id: params["recipient_id"]).all
+  end
+
   private
   # These are helpers for building API queries. Realistically, I'd probably split these off into
   # another module, but I'll but them here for simplicity.

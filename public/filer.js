@@ -228,8 +228,7 @@ const Awards = (() => {
         awardsCount = await fetchAwardsCount(Filings.getCurrentFilingId(), filters);
         page = 1;
         updateAwardsTableRows();
-        updateAwardsPaginationButtons();
-        updateAwardsCurrentPageInfo();
+        updateAwardsPagination();
         changeQueryString(filters, 1);
     };
 
@@ -242,8 +241,7 @@ const Awards = (() => {
         awardsByPage[newPage] = awards;
         page = newPage;
         updateAwardsTableRows();
-        updateAwardsPaginationButtons();
-        updateAwardsCurrentPageInfo();
+        updateAwardsPagination();
         changeQueryString(filters, 1);
     };
 
@@ -288,7 +286,8 @@ const Awards = (() => {
         }
         for (const award of awards) {
             const row = awardsRowTemplate.content.cloneNode(true).firstElementChild;
-            row.children[0].textContent = award.name;
+            row.children[0].children[0].href = `/recipient/${award.recipient_id}`;
+            row.children[0].children[0].textContent = award.name;
             row.children[1].querySelector(".recipient_address_first_line").textContent = award.address_line1 || "";
             let recipientAddressLine2Tokens = [];
             if (award.city != null) {
@@ -307,7 +306,16 @@ const Awards = (() => {
         }
     };
 
-    const updateAwardsPaginationButtons = () => {
+    const updateAwardsPagination = () => {
+        let startNum
+        if (awardsCount === 0) {
+            startNum = 0;
+        } else {
+            startNum = ((page - 1) * pageSize) + 1;
+        }
+        let endNum = Math.min(startNum + pageSize - 1, awardsCount);
+        awardsCurrentPage.textContent = `Showing ${startNum} - ${endNum} of ${awardsCount}`;
+
         if (page === 1) {
             awardsFirstPageButton.disabled = true;
             awardsPrevPageButton.disabled = true;
@@ -315,19 +323,13 @@ const Awards = (() => {
             awardsFirstPageButton.disabled = false;
             awardsPrevPageButton.disabled = false;
         }
-        if (page === Math.ceil(awardsCount / pageSize)) {
+        if (page === Math.floor(awardsCount / pageSize) + 1) {
             awardsNextPageButton.disabled = true;
             awardsLastPageButton.disabled = true;
         } else {
             awardsNextPageButton.disabled = false;
             awardsLastPageButton.disabled = false;
         }
-    };
-
-    const updateAwardsCurrentPageInfo = () => {
-        let startNum = ((page - 1) * pageSize) + 1;
-        let endNum = Math.min(startNum + pageSize - 1, awardsCount);
-        awardsCurrentPage.textContent = `Showing ${startNum} - ${endNum} of ${awardsCount}`;
     };
 
     const getFiltersFromDom = () => {

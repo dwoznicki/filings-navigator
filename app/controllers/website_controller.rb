@@ -4,4 +4,7 @@ class WebsiteController < ApplicationController
 
   def filer
   end
+
+  def recipient
+  end
 end

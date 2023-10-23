@@ -7,19 +7,13 @@
     </li>
   </template>
 </ul>
-<div id="filing_details">
-  <div>
-    <span>Tax year:</span>
-    <span id="filing_detail_tax_year"></span>
-  </div>
-  <div>
-    <span>Amended?:</span>
-    <span id="filing_detail_amended"></span>
-  </div>
-  <div>
-    <span>Return time:</span>
-    <span id="filing_detail_return_time"></span>
-  </div>
+<div id="filing_details" class="details_container">
+  <div class="detail_label">Tax year</div>
+  <div class="detail_value" id="filing_detail_tax_year"></div>
+  <div class="detail_label">Amended?</div>
+  <div class="detail_value" id="filing_detail_amended"></div>
+  <div class="detail_label">Return time</div>
+  <div class="detail_value" id="filing_detail_return_time"></div>
 </div>
 <div id="multiple_filings" style="display:none;">
   There are <span class="num_filings"></span> filings for this tax year.
@@ -139,7 +133,9 @@
   <tbody>
     <template id="awards_row_template">
       <tr>
-        <td></td>
+        <td>
+          <a href="#" title="See recipient details"></a>
+        </td>
         <td>
           <div class="recipient_address_first_line"></div>
           <div class="recipient_address_second_line"></div>

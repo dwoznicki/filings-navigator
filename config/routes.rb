@@ -10,4 +10,5 @@ Rails.application.routes.draw do
   # Website routes
   get "/", to: "website#home", defaults: {format: :html}
   get "/filer/:filer_id", to: "website#filer", defaults: {format: :html}
+  get "/recipient/:recipient_id", to: "website#recipient", defaults: {format: :html}
 end
