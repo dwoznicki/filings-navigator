@@ -7,7 +7,7 @@
 # filers and recipients into two separate models to avoid SQL joins.
 class Organization < ApplicationRecord
   has_many :filings, foreign_key: "filer_id"
-  has_one :awards, foreign_key: "recipient_id"
+  has_many :awards, foreign_key: "recipient_id"
 
   def self.from_xml(node)
     # TODO: Raise exceptions with a proper type instead of runtime exceptions.

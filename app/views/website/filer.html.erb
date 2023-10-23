@@ -6,5 +6,61 @@
     </li>
   </template>
 </ul>
+<div id="filing_details">
+  <div>
+    <span>Tax year:</span>
+    <span id="filing_detail_tax_year"></span>
+  </div>
+  <div>
+    <span>Amended?:</span>
+    <span id="filing_detail_amended"></span>
+  </div>
+  <div>
+    <span>Return time:</span>
+    <span id="filing_detail_return_time"></span>
+  </div>
+</div>
+<div id="multiple_filings" style="display:none;">
+  There are <span class="num_filings"></span> filings for this tax year.
+  <!-- TODO: Here I'd like to add a link to previous filings, and maybe even a diff so users could quickly see what's changed between revisions. This could easily be a lot of work, so it's probably only worth it if this is a feature that users would actually find helpful. -->
+</div>
+<table id="awards_table" style="text-align:left;width:100%;">
+  <thead>
+    <tr>
+      <th>Recipient name</th>
+      <th>Recipient address</th>
+      <th>Cash amount</th>
+      <th>Purpose</th>
+    </tr>
+  </thead>
+  <tbody>
+    <template id="awards_row_template">
+      <tr>
+        <td></td>
+        <td>
+          <div class="recipient_address_first_line"></div>
+          <div class="recipient_address_second_line"></div>
+        </td>
+        <td></td>
+        <td></td>
+      </tr>
+    </template>
+  </tbody>
+  <tfoot>
+    <tr>
+      <td colspan="1000">
+        <div>
+          <button id="awards_first_page_button">First</button>
+          <button id="awards_prev_page_button">Previous</button>
+        </div>
+        <div id="awards_current_page"></div>
+        <div>
+          <button id="awards_next_page_button">Next</button>
+          <button id="awards_last_page_button">Last</button>
+        </div>
+      </td>
+    </tr>
+  </tfoot>
+</table>
 
 <script type="text/javascript" src="/filer.js"></script>

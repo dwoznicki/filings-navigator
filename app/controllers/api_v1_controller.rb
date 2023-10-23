@@ -21,8 +21,15 @@ class ApiV1Controller < ApplicationController
   end
 
   def get_awards
-    query = Award.all
+    query = Award.joins("LEFT JOIN organizations ON awards.recipient_id = organizations.id")
+      .select "awards.id AS id, awards.cash_amount, awards.purpose, awards.filing_id, awards.recipient_id, organizations.name, organizations.address_line1, organizations.city, organizations.state_code, organizations.zip_code"
     render json: ApiV1Controller.build_awards_query(params, query, :select).all
+  end
+
+  def count_awards
+    query = Award.joins("LEFT JOIN organizations ON awards.recipient_id = organizations.id")
+      # .select "awards.id AS id, awards.cash_amount, awards.purpose, awards.filing_id, awards.recipient_id, organizations.name, organizations.address_line1, organizations.city, organizations.state_code, organizations.zip_code"
+    render json: ApiV1Controller.build_awards_query(params, query, :count).count
   end
 
   def get_recipients
@@ -61,10 +68,16 @@ class ApiV1Controller < ApplicationController
       query = query.where filing_id: params["filing_id"]
     end
     if query_type == :select
-      if params["order"] == "created_at_asc"
-        ordering = "created_at ASC"
+      # if params["order"] == "created_at_asc"
+      #   ordering = "created_at ASC"
+      # else
+      #   ordering = "created_at DESC" # default
+      # end
+      # query = query.order ordering
+      if params["order"] == "name_desc"
+        ordering = "organizations.name DESC"
       else
-        ordering = "created_at DESC" # default
+        ordering = "organizations.name ASC"
       end
       query = query.order ordering
       query = ApiV1Controller.paginate params, query
