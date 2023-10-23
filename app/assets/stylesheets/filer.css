@@ -37,3 +37,27 @@
     display: flex;
     justify-content: space-between;
 }
+
+.form-group > label, .form-group .helper-text {
+    display: block;
+}
+
+#name_filter {
+    width: 50%;
+    box-sizing: border-box;
+}
+
+#address_fields {
+    display: flex;
+    column-gap: 8px;
+    width: 50%;
+}
+
+#address_fields .form-group {
+    width: 100%;
+}
+
+#city_filter, #state_code_filter, #zip_code_filter {
+    width: 100%;
+    box-sizing: border-box;
+}

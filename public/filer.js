@@ -140,9 +140,12 @@ const Filings = (() => {
 
 const Awards = (() => {
     // State
-    let awardsByPage = {}; // This will be our state for the awards table rows.
     let page = 1;
     let pageSize = 10;
+    // NOTE: Right now, we only cache previous results by page. This could lead to extra data
+    // fetching when filters are added and removed. To optimize, we'd probably want to cache by
+    // filter state in addition to page.
+    let awardsByPage = {}; 
     let awardsCount;
 
     // Elements
@@ -153,6 +156,14 @@ const Awards = (() => {
     const awardsNextPageButton = document.getElementById("awards_next_page_button");
     const awardsLastPageButton = document.getElementById("awards_last_page_button");
     const awardsCurrentPage = document.getElementById("awards_current_page");
+    const awardsFiltersToggler = document.getElementById("awards_filters_toggler");
+    const awardsFiltersForm = document.getElementById("awards_filters_form");
+    const nameFilter = document.getElementById("name_filter");
+    const cityFilter = document.getElementById("city_filter");
+    const stateCodeFilter = document.getElementById("state_code_filter");
+    const zipCodeFilter = document.getElementById("zip_code_filter");
+    const cashAmountOperatorFilter = document.getElementById("cash_amount_operator_filter");
+    const cashAmountFilter = document.getElementById("cash_amount_filter");
 
     // Intialization
     awardsFirstPageButton.addEventListener("click", () => {
@@ -181,6 +192,11 @@ const Awards = (() => {
         gotoTablePage(lastPage);
     });
 
+    awardsFiltersForm.addEventListener("submit", (event) => {
+        event.preventDefault();
+        resetTable();
+    });
+
     // Fuctions
     const fetchAwards = async (filingId, filters, page) => {
         const params = new URLSearchParams(filters);
@@ -204,27 +220,60 @@ const Awards = (() => {
     };
 
     const resetTable = async () => {
-        const awards = await fetchAwards(Filings.getCurrentFilingId(), {}, 1);
+        const filters = getFiltersFromDom();
+        const awards = await fetchAwards(Filings.getCurrentFilingId(), filters, 1);
         awardsByPage = {
             1: awards,
         };
-        awardsCount = await fetchAwardsCount(Filings.getCurrentFilingId(), {});
+        awardsCount = await fetchAwardsCount(Filings.getCurrentFilingId(), filters);
         page = 1;
         updateAwardsTableRows();
         updateAwardsPaginationButtons();
         updateAwardsCurrentPageInfo();
+        changeQueryString(filters, 1);
     };
 
     const gotoTablePage = async (newPage) => {
+        const filters = getFiltersFromDom();
         let awards = awardsByPage[newPage];
         if (awards == null) {
-            awards = await fetchAwards(Filings.getCurrentFilingId(), {}, newPage);
+            awards = await fetchAwards(Filings.getCurrentFilingId(), filters, newPage);
         }
         awardsByPage[newPage] = awards;
         page = newPage;
         updateAwardsTableRows();
         updateAwardsPaginationButtons();
         updateAwardsCurrentPageInfo();
+        changeQueryString(filters, 1);
+    };
+
+    const initializeFiltersFromQueryString = () => {
+        const params = new URLSearchParams(window.location.search);
+        let filterFound = false;
+        if (params.has("recipient_name")) {
+            nameFilter.value = params.get("recipient_name");
+            filterFound = true;
+        }
+        if (params.has("city")) {
+            cityFilter.value = params.get("city");
+            filterFound = true;
+        }
+        if (params.has("state_code")) {
+            stateCodeFilter.value = params.get("state_code");
+            filterFound = true;
+        }
+        if (params.has("zip_code")) {
+            zipCodeFilter.value = params.get("zip_code");
+            filterFound = true;
+        }
+        if (params.has("cash_amount")) {
+            cashAmountOperatorFilter.value = params.get("cash_amount_operator");
+            cashAmountFilter.value = params.get("cash_amount");
+            filterFound = true;
+        }
+        if (filterFound) {
+            awardsFiltersToggler.open = true;
+        }
     };
 
     // Internal functions
@@ -281,17 +330,73 @@ const Awards = (() => {
         awardsCurrentPage.textContent = `Showing ${startNum} - ${endNum} of ${awardsCount}`;
     };
 
+    const getFiltersFromDom = () => {
+        const filters = {};
+        if (nameFilter.value) {
+            filters.recipient_name = nameFilter.value;
+        }
+        if (cityFilter.value) {
+            filters.city = cityFilter.value;
+        }
+        if (stateCodeFilter.value) {
+            filters.state_code = stateCodeFilter.value;
+        }
+        if (zipCodeFilter.value) {
+            filters.zip_code = zipCodeFilter.value;
+        }
+        if (cashAmountFilter.value) {
+            filters.cash_amount_operator = cashAmountOperatorFilter.value || "equal";
+            filters.cash_amount = cashAmountFilter.value;
+        }
+        return filters;
+    };
+
+    const changeQueryString = (filters, page) => {
+        const url = new URL(window.location.href);
+        if (filters.recipient_name != null) {
+            url.searchParams.set("recipient_name", filters.recipient_name);
+        } else {
+            url.searchParams.delete("recipient_name");
+        }
+        if (filters.city != null) {
+            url.searchParams.set("city", filters.city);
+        } else {
+            url.searchParams.delete("city");
+        }
+        if (filters.state_code != null) {
+            url.searchParams.set("state_code", filters.state_code);
+        } else {
+            url.searchParams.delete("state_code");
+        }
+        if (filters.zip_code != null) {
+            url.searchParams.set("zip_code", filters.zip_code);
+        } else {
+            url.searchParams.delete("zip_code");
+        }
+        if (filters.cash_amount != null) {
+            url.searchParams.set("cash_amount_operator", filters.cash_amount_operator);
+            url.searchParams.set("cash_amount", filters.cash_amount);
+        } else {
+            url.searchParams.delete("cash_amount_operator");
+            url.searchParams.delete("cash_amount");
+        }
+        url.searchParams.set("page", page);
+        window.history.replaceState(null, null, url);
+    };
+
     return {
         fetchAwards,
         fetchAwardsCount,
         resetTable,
         gotoTablePage,
+        initializeFiltersFromQueryString,
     };
 })();
 
 // -------------------------------------------------------------------------------------------------
 // Pagination
 const main = async () => {
+    Awards.initializeFiltersFromQueryString();
     // Start our fetches in parallel.
     const filerPromise = Filings.fetchFiler();
     const filingsPromise = Filings.fetchFilings();

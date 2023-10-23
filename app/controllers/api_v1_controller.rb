@@ -28,17 +28,30 @@ class ApiV1Controller < ApplicationController
 
   def count_awards
     query = Award.joins("LEFT JOIN organizations ON awards.recipient_id = organizations.id")
-      # .select "awards.id AS id, awards.cash_amount, awards.purpose, awards.filing_id, awards.recipient_id, organizations.name, organizations.address_line1, organizations.city, organizations.state_code, organizations.zip_code"
     render json: ApiV1Controller.build_awards_query(params, query, :count).count
   end
 
-  def get_recipients
-    query = Organization.joins(:awards).distinct
+  private
+  # These are helpers for building API queries. Realistically, I'd probably split these off into
+  # another module, but I'll but them here for simplicity.
+  def self.build_awards_query(params, query, query_type)
     if params["filing_id"] != nil
-      query = query.where "awards.filing_id = ?", params["filing_id"]
+      query = query.where filing_id: params["filing_id"]
+    end
+    if params["recipient_name"] != nil
+      query = query.where "organizations.name LIKE ?", "%#{params["recipient_name"]}%"
+    end
+    if params["city"] != nil
+      query = query.where "organizations.city = ?", params["city"]
     end
     if params["state_code"] != nil
-      query = query.where "organizations.state_code = ?", params["state_code"]
+      query = query.where "organizations.state_code = UPPER(?)", params["state_code"]
+    end
+    if params["zip_code"] != nil
+      query = query.where "organizations.zip_code = ?", params["zip_code"]
+    end
+    if params["cash_amount"] != nil
+      query = query.where "organizations.zip_code = ?", params["zip_code"]
     end
     if params["cash_amount"] != nil
       if params["cash_amount_operator"] == "greater"
@@ -50,30 +63,7 @@ class ApiV1Controller < ApplicationController
       end
       query = query.where "awards.cash_amount #{operator} ?", params["cash_amount"].to_i
     end
-    if params["order"] == "created_at_asc"
-      ordering = "created_at ASC"
-    else
-      ordering = "created_at DESC" # default
-    end
-    query = query.order ordering
-    query = ApiV1Controller.paginate params, query
-    render json: query.all
-  end
-
-  private
-  # These are helpers for building API queries. Realistically, I'd probably split these off into
-  # another module, but I'll but them here for simplicity.
-  def self.build_awards_query(params, query, query_type)
-    if params["filing_id"] != nil
-      query = query.where filing_id: params["filing_id"]
-    end
     if query_type == :select
-      # if params["order"] == "created_at_asc"
-      #   ordering = "created_at ASC"
-      # else
-      #   ordering = "created_at DESC" # default
-      # end
-      # query = query.order ordering
       if params["order"] == "name_desc"
         ordering = "organizations.name DESC"
       else
