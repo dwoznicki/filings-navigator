@@ -1,0 +1,39 @@
+#filings_list {
+    list-style: none;
+    padding: 0px;
+    margin: 0px;
+    display: flex;
+    column-gap: 4px;
+}
+
+#awards_table {
+    text-align: left;
+    width: 100%;
+    border-collapse: collapse;
+}
+
+#awards_table thead th, #awards_table tbody td {
+    border: 1px solid black;
+    padding: 4px;
+}
+
+#awards_table thead th:nth-child(1) {
+    width: 30%;
+}
+
+#awards_table thead th:nth-child(2) {
+    width: 30%;
+}
+
+#awards_table thead th:nth-child(3) {
+    width: 10%;
+}
+
+#awards_table thead th:nth-child(4) {
+    width: 30%;
+}
+
+.pagination_container {
+    display: flex;
+    justify-content: space-between;
+}

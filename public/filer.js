@@ -47,7 +47,7 @@ const Filings = (() => {
     const setCurrentFilingId = (filingId) => currentFilingId = filingId;
 
     const updateFilerHeader = (filer) => {
-        filerHeader.textContent = `Filer ${filer.name ?? ""}`;
+        filerHeader.textContent = filer.name ?? "";
     };
 
     const groupFilingsByTaxYear = (filings) => {
@@ -91,10 +91,10 @@ const Filings = (() => {
         const button = item.children[0];
         button.textContent = taxYear;
         button.dataset.taxYear = taxYear;
-        button.dataset.selected = "false";
+        button.disabled = false;
         button.addEventListener("click", () => {
             // Clicking the button for the current tax year should do nothing.
-            if (button.dataset.selected === "true") {
+            if (button.disabled) {
                 return;
             }
             changeCurrentFiling(filingGroup);
@@ -107,7 +107,7 @@ const Filings = (() => {
         url.searchParams.set("tax_year", taxYear);
         window.history.replaceState(null, null, url);
         for (const button of filingsList.querySelectorAll(".tax_year_button")) {
-            button.dataset.selected = button.dataset.taxYear === taxYear;
+            button.disabled = button.dataset.taxYear === String(taxYear);
         }
     };
 

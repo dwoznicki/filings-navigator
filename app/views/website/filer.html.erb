@@ -1,4 +1,5 @@
 <h1 id="filer_header">Filer</h1>
+<h2>Filings</h2>
 <ul id="filings_list">
   <template id="filings_item_template">
     <li>
@@ -24,7 +25,8 @@
   There are <span class="num_filings"></span> filings for this tax year.
   <!-- TODO: Here I'd like to add a link to previous filings, and maybe even a diff so users could quickly see what's changed between revisions. This could easily be a lot of work, so it's probably only worth it if this is a feature that users would actually find helpful. -->
 </div>
-<table id="awards_table" style="text-align:left;width:100%;">
+<h2>Awards</h2>
+<table id="awards_table">
   <thead>
     <tr>
       <th>Recipient name</th>
@@ -49,14 +51,16 @@
   <tfoot>
     <tr>
       <td colspan="1000">
-        <div>
-          <button id="awards_first_page_button">First</button>
-          <button id="awards_prev_page_button">Previous</button>
-        </div>
-        <div id="awards_current_page"></div>
-        <div>
-          <button id="awards_next_page_button">Next</button>
-          <button id="awards_last_page_button">Last</button>
+        <div class="pagination_container">
+          <div>
+            <button id="awards_first_page_button">First</button>
+            <button id="awards_prev_page_button">Previous</button>
+          </div>
+          <div id="awards_current_page"></div>
+          <div>
+            <button id="awards_next_page_button">Next</button>
+            <button id="awards_last_page_button">Last</button>
+          </div>
         </div>
       </td>
     </tr>
